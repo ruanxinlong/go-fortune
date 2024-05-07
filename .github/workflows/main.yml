@@ -48,16 +48,11 @@ jobs:
   # 3.If any vulnerabilities are found in the code base, 
   #   send a message to the provided Slack channel. 
   #   Upload the report produced in step 2 to the Slack channel.
-  send-message-to-slack:
-    needs: source-code-scan
-    if: ${{ needs.source-code-scan.outputs.total_high >= 2 }}
-    runs-on: ubuntu-latest
-    steps:
-    # - name: use secret
-    #   shell: bash
-    #   run: |
-    #     # SECRET_HANDLE="${{ needs.source-code-scan.outputs.handle }}"
-    #     echo "We retrieved our masked secret: SECRET_HANDLE"
+  # send-message-to-slack:
+  #   needs: source-code-scan
+    # runs-on: ubuntu-latest
+    # steps:
+      if: ${{ needs.source-code-scan.outputs.total_high >= 2 }}
     - name: Send message to Slack
       uses: rtCamp/action-slack-notify@v2
       env:
