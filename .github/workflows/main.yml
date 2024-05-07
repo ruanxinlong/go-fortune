@@ -35,9 +35,10 @@ jobs:
       id: count_vulnerabilities
       shell: bash
       run: |
-        critical_count=$(grep -c 'CRITICAL' trivy-results.txt || true)
-        high_count=$(grep -c 'HIGH' trivy-results.txt || true)
-        total_count=$(($critical_count + $high_count))
+        cat trivy-results.txt
+        total_count=$(grep -c 'CRITICAL' trivy-results.txt || true)
+        # high_count=$(grep -c 'HIGH' trivy-results.txt || true)
+        # total_count=$(($critical_count + $high_count))
         echo "total=$total_count" >> "$GITHUB_OUTPUT"
         echo $total_count
 
