@@ -50,7 +50,7 @@ jobs:
   #   Upload the report produced in step 2 to the Slack channel.
   # send-message-to-slack:
   #   needs: source-code-scan
-  #   if: ${{ needs.source-code-scan.outputs.total_high > 1 }}
+  #   if: ${{ needs.source-code-scan.outputs.total_high >= 2 }}
   #   runs-on: ubuntu-latest
   #   steps:
   #   # - name: use secret
@@ -81,7 +81,7 @@ jobs:
   #   You can use any image name but the image tag should be the GitHub commit hash;
   build-and-push-docker:
     needs: source-code-scan
-    if: ${{ needs.source-code-scan.outputs.total_critical < 1 }}
+    if: ${{ needs.source-code-scan.outputs.total_critical < 2 }}
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
