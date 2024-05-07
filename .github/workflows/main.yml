@@ -13,7 +13,8 @@ jobs:
     if: ${{ startsWith(github.event.head_commit.message, '#NORUN') != true }}
     runs-on: ubuntu-latest
     outputs:
-      total: ${{ steps.count_vulnerabilities.outputs.total }}
+      total_critical: ${{ steps.count_vulnerabilities.outputs.total_critical }}
+      total_high: ${{ steps.count_vulnerabilities.outputs.total_high }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -36,18 +37,20 @@ jobs:
       shell: bash
       run: |
         cat trivy-results.txt
-        total_count=$(grep -c 'CRITICAL' trivy-results.txt || true)
-        # high_count=$(grep -c 'HIGH' trivy-results.txt || true)
+        critical_count=$(grep -c 'CRITICAL' trivy-results.txt || true)
+        high_count=$(grep -c 'HIGH' trivy-results.txt || true)
         # total_count=$(($critical_count + $high_count))
-        echo "total=$total_count" >> "$GITHUB_OUTPUT"
-        echo $total_count
+        echo "total_critical=$critical_count" >> "$GITHUB_OUTPUT"
+        echo "total_high=$high_count" >> "$GITHUB_OUTPUT"
+        echo $critical_count
+        echo $high_count
 
   # 3.If any vulnerabilities are found in the code base, 
   #   send a message to the provided Slack channel. 
   #   Upload the report produced in step 2 to the Slack channel.
   send-message-to-slack:
     needs: source-code-scan
-    if: ${{ needs.source-code-scan.outputs.total > 1 }}
+    if: ${{ needs.source-code-scan.outputs.total_high > 1 }}
     runs-on: ubuntu-latest
     steps:
     # - name: use secret
@@ -78,7 +81,7 @@ jobs:
   #   You can use any image name but the image tag should be the GitHub commit hash;
   build-and-push-docker:
     needs: source-code-scan
-    if: ${{ needs.source-code-scan.outputs.total < 1 }}
+    if: ${{ needs.source-code-scan.outputs.total_critical < 1 }}
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -99,7 +102,7 @@ jobs:
       id: build-and-push
       with:
         push: true
-        tags: cleverest/test:${{ github.sha }}
+        tags: ruanxl/go-fortune:${{ github.sha }}
 
     # 6. Digitally sign the image that you have built and push in steps 4 and 5
     - name: Install Cosign
@@ -118,14 +121,14 @@ jobs:
 
     # 7.Send a notification to Slack on the successful run of the workflow. 
     #   The notification should include all the following information
-    # - name: Send GitHub Action trigger data to Slack workflow
-    #   uses: rtCamp/action-slack-notify@v2
-    #   env:
-    #       SLACK_TITLE: "Image build and signed"
-    #       SLACK_MESSAGE: |
-    #         Name: Yway Chit Aung
-    #         Matriculation: A0287270Y
-    #         Email: e1285216@u.nus.edu
-    #         GitHub: https://github.com/ywaychitaung/CI-CD-Workshop.git
-    #         Docker: https://hub.docker.com/repository/docker/ywaychitaung/ci-cd-workshop/general
-    #       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+    - name: Send GitHub Action trigger data to Slack workflow
+      uses: rtCamp/action-slack-notify@v2
+      env:
+          SLACK_TITLE: "Image build and signed"
+          SLACK_MESSAGE: |
+            Name: ruan xinlong
+            Matriculation: A0291658N
+            Email: e1333154@u.nus.edu
+            GitHub: https://github.com/ruanxinlong/go-fortune.git
+            Docker: https://hub.docker.com/repository/docker/ruanxl/go-fortune/general
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
