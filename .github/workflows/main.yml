@@ -49,27 +49,27 @@ jobs:
     if: ${{ needs.source-code-scan.outputs.total > 1 }}
     runs-on: ubuntu-latest
     steps:
-    - name: use secret
-      shell: bash
-      run: |
-        # SECRET_HANDLE="${{ needs.source-code-scan.outputs.handle }}"
-        echo "We retrieved our masked secret: SECRET_HANDLE"
-    # - name: Send message to Slack
-    #   uses: rtCamp/action-slack-notify@v2
-    #   env:
-    #       SLACK_COLOR: '#FF0000'
-    #       SLACK_TITLE: "Scan failed - Yway Chit Aung"
-    #       SLACK_MESSAGE: |
-    #         Failed trivy scan, see uploaded report
-    #       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+    # - name: use secret
+    #   shell: bash
+    #   run: |
+    #     # SECRET_HANDLE="${{ needs.source-code-scan.outputs.handle }}"
+    #     echo "We retrieved our masked secret: SECRET_HANDLE"
+    - name: Send message to Slack
+      uses: rtCamp/action-slack-notify@v2
+      env:
+          SLACK_COLOR: '#FF0000'
+          SLACK_TITLE: "Scan failed - ruan xinlong"
+          SLACK_MESSAGE: |
+            Failed trivy scan, see uploaded report
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-    # # Upload the report file to Slack
-    # - uses: MeilCli/slack-upload-file@v3
-    #   with:
-    #     slack_token: ${{ secrets.SLACK_TOKEN }}
-    #     channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
-    #     file_path: 'trivy-results.txt'
-    #     initial_comment: 'Scan report by Yway Chit Aung'
+    # Upload the report file to Slack
+    - uses: MeilCli/slack-upload-file@v3
+      with:
+        slack_token: ${{ secrets.SLACK_TOKEN }}
+        channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
+        file_path: 'trivy-results.txt'
+        initial_comment: 'Scan report by ruan xinlong'
 
 
   # 4.If the scan produces no vulnerabilities, 
